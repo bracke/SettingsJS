@@ -1,0 +1,7 @@
+/* Will be compiled down to a single stylesheet with your sass files */
+
+textarea                    { font-family: monospace; }
+::-webkit-input-placeholder { font-family:Arial; color:#999; text-align: center; font-size:18px; padding-top:25px; }
+:-moz-placeholder           { font-family:Arial; color:#999; text-align: center; font-size:18px; padding-top:25px; }
+:-ms-input-placeholder      { font-family:Arial; color:#999; text-align: center; font-size:18px; padding-top:25px; }
+.placeholder                { font-family:Arial; color:#999; text-align: center; font-size:18px; padding-top:25px; }
