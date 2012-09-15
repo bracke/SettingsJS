@@ -1,21 +1,22 @@
 /*
 
- SettingsJS v1.0.0
+ SettingsJS
  Author: Bent Bracke, bracke.dk
  License: MIT license http://opensource.org/licenses/mit-license.php/
 
  Example          : var settingsobj = settings(JSON,settingscontainerid,settings);
- Example JSON     : {"ircEvent":"PRIVMSG", "method":"newURI", "regex":"^http://.*", "subobject":{  "whatever1" :true, "whatever2" :""  }}
+ Example JSON     : { "sleep_time": { "enabled": true }, "trend_location":  { "name": "Worldwide", "woeid": 1, "country": "",
+                      "url": "http://where.yahooapis.com/v1/place/1" }, "geo_enabled": true }
+
  Example settings : { "defaulttabname" : "Main", "formfield_nameprefix" : "Settingsformfield" }
 
  */
-
 
 var settings = (function () {
 
     "use strict";
 
-    var model; var settingsconfig;
+    var model; var unchangedModel; var settingsconfig;
     var default_config = { "defaulttabname" : "General", "formfield_nameprefix" : "SettingsFormField" }
 
     var constructor = function settings(jsonobject, settingscontainer, config) {
@@ -37,7 +38,7 @@ var settings = (function () {
         settingsconfig = config ? config : default_config;
 
 
-        model = jsonobject;
+        model = jsonobject; unchangedModel = model;
 
         var new_content = generate_tabs(settingsconfig.defaulttabname);
 
@@ -80,8 +81,12 @@ var settings = (function () {
         update_model();
         return JSON.stringify(model);
     }
-    var update_model = function ()
-    {
+    constructor.resetModel = function(){
+
+        model = unchangedModel;
+        update_model();
+    }
+    var update_model = function () {
         var current_tabs = document.getElementsByClassName("active");
         if (current_tabs.length > 0) {
             var current_tab = current_tabs[0]; var current_tabid = current_tab.id;
@@ -99,6 +104,15 @@ var settings = (function () {
 
                         case "object"  :
 
+                            break;
+
+                        case "number"  :
+
+                            var numbertextbox = document.getElementById(settingsconfig.formfield_nameprefix + key);
+                            if (numbertextbox != null)
+                            {
+                                tabmodel[key] = parseInt(numbertextbox.value,10);
+                            }
                             break;
 
                         case "string"  :
@@ -129,7 +143,7 @@ var settings = (function () {
 
         var new_content = "<li id='tab_" + tab + "'";
         new_content += activetabname == tab ? " class='active' " : "";
-        new_content += "><a href=\"javascript:settings.switch_tab('" + tab + "');\">" + tab + "</a></li>";
+        new_content += "><a href=\"javascript:settings.switch_tab('" + tab + "');\">" + prettify_Label(tab) + "</a></li>";
 
         return new_content;
     }
@@ -152,6 +166,78 @@ var settings = (function () {
 
         return new_content;
     }
+    var prettify_Label = function(label){
+        var name = label;
+
+        name = name.replace(/_/g, " ");
+        name = (name.substr(0,1)).toUpperCase() + name.substr(1,name.length);
+
+        return name;
+    }
+    var guess_inputTypeText = function (key) {
+        var inputtype = "text";
+
+        if (key != null && key.length > 0) {
+
+            switch (key.toLowerCase()) {
+
+                case "find"     :
+                case "search"   : inputtype = "search"; break;
+
+                case "datetime" : inputtype = "datetime"; break;
+                case "date"     : inputtype = "date"; break;
+                case "time"     : inputtype = "time"; break;
+                case "week"     : inputtype = "week"; break;
+                case "month"    : inputtype = "month"; break;
+
+                case "color"    :
+                case "colour"   : inputtype = "color"; break;
+
+                case "passcode" :
+                case "code"     :
+                case "password" : inputtype = "password"; break;
+
+                case "mailto"   :
+                case "mail"     :
+                case "email"    : inputtype = "email"; break;
+
+                case "link"     :
+                case "href"     :
+                case "www"      :
+                case "url"      : inputtype = "url"; break;
+
+                case "phone"       :
+                case "telephone"   :
+                case "tel"         : inputtype = "tel"; break;
+
+                default : inputtype = "text"; break;
+            }
+        }
+        return inputtype;
+    }
+    var guess_inputTypeNumber = function (key) {
+        var inputtype = "number";
+
+        if (key != null && key.length > 0) {
+
+            switch (key.toLowerCase()) {
+
+                case "week"         : inputtype = "week"; break;
+                case "month"        : inputtype = "month"; break;
+
+                case "passcode"     :
+                case "code"         :
+                case "password"     : inputtype = "password"; break;
+
+                case "phone"        :
+                case "telephone"    :
+                case "tel"          : inputtype = "tel"; break;
+
+                default : inputtype = "number"; break;
+            }
+        }
+        return inputtype;
+    }
     var generate_tabcontent = function (tabname) {
 
         var new_content = "<form class='form-horizontal'>";
@@ -169,12 +255,25 @@ var settings = (function () {
 
                         break;
 
+                    case "number"  :
+
+                        new_content += "<div class='control-group'>"+
+                            "<label class='control-label' for='" + settingsconfig.formfield_nameprefix + key + "'>" + prettify_Label(key) + "</label>" +
+                            "<div class='controls'>" +
+                            "<input type='"+guess_inputTypeNumber(key)+"' id='" + settingsconfig.formfield_nameprefix + key + "' placeholder='" + key + "'";
+                        if (first) {
+                            new_content += " autofocus=autofocus ";
+                            first = false;
+                        }
+                        new_content += " value='" + tabmodel[key] + "'></div></div>";
+                        break;
+
                     case "string"  :
 
                         new_content += "<div class='control-group'>"+
-                                       "<label class='control-label' for='" + settingsconfig.formfield_nameprefix + key + "'>" + key + "</label>" +
+                                       "<label class='control-label' for='" + settingsconfig.formfield_nameprefix + key + "'>" + prettify_Label(key) + "</label>" +
                                        "<div class='controls'>" +
-                                       "<input type='text' id='" + settingsconfig.formfield_nameprefix + key + "' placeholder='" + key + "'";
+                                       "<input type='"+guess_inputTypeText(key)+"' id='" + settingsconfig.formfield_nameprefix + key + "' placeholder='" + key + "'";
                         if (first) {
                             new_content += " autofocus=autofocus ";
                             first = false;
@@ -188,7 +287,7 @@ var settings = (function () {
                                        "<label class='checkbox'><input id='" + settingsconfig.formfield_nameprefix  + key + "' type='checkbox'";
 
                         if (tabmodel[key]) { new_content += " checked "; }
-                        new_content += ">" + key + "</label></div></div>";
+                        new_content += ">" + prettify_Label(key) + "</label></div></div>";
                         break;
 
                     default : break;
