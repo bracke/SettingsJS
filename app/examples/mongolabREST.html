@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+   <meta charset="utf-8"/>
+   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+
+   <title>Settingsjs</title>
+
+   <meta name="description" content=""/>
+   <meta name="viewport" content="width=device-width"/>
+   <link rel="stylesheet" href="../styles/bootstrap.css">
+   <link rel="stylesheet" href="../styles/main.css"/>
+    <script src="../scripts/vendor/jquery.min.js"></script>
+   <script src="../scripts/vendor/modernizr.min.js"></script>
+</head>
+<body>
+<div class="container" style="margin-top:30px">
+    <div class="hero-unit" style="padding:10px">
+        <h2>Settingsjs</h2>
+        <p>Focus on the awesome part of your app - let Settingsjs handle the settings of your app. </p>
+    </div>
+
+    <button type="submit" class="btn btn-primary" onclick="save()">Save</button>
+    <button type="button" class="btn" onclick="reset()">Reset</button>
+    <br><br>
+    <div class="alert " id="message" style="display:none">
+
+    </div>
+
+    <div id="settingscontainer"></div>
+
+</div>
+
+<!--[if lt IE 7]>
+  <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+<![endif]-->
+
+<script src="../scripts/settings.js"></script>
+<script>
+$(document).ready(function() {
+
+    display_message("info","<strong>Loading settings&hellip;</strong>");
+
+  $.get('https://api.mongolab.com/api/1/databases/settings/collections/Settings/508bc93fe4b035ff07862200/?apiKey=507717d1e4b03a45bd2f3308&f=%7B%22_id%22:%200%7D&q=%7B%22_id%22:508bc93fe4b035ff07862200%7D', function(data) {
+
+  var settingsobj = Settings.initialize(data,"settingscontainer");
+
+      hide_message();
+  });
+});
+var hide_message = function ()
+{
+    document.getElementById('message').style.display = 'none';
+}
+ var display_message = function(messagetype,messagehtml)
+ {
+     var buttonhtml = '<button type="button" class="close" data-dismiss="alert" onclick="hide_message()">×</button>';
+
+     var message = document.getElementById("message");
+     message.classList.remove('alert-success');
+     message.classList.remove('alert-error');
+     message.classList.remove('alert-info');
+
+     try {
+        message.classList.add('alert-'+messagetype);
+        message.innerHTML = buttonhtml + messagehtml;
+     }
+     catch(err)
+     {
+         message.classList.add('alert-error');
+         message.innerHTML = buttonhtml + "<strong>Error!</strong> " + err.message;
+     }
+     message.style.display = "block";
+ }
+ var reset = function (){
+
+     Settings.resetModel();
+     display_message("info","<strong>Info</strong> Your settings have been reset to their start values.'");
+
+ }
+ var save = function (){
+
+     display_message("info","<strong>Saving&hellip;</strong>");
+
+     try {
+         var data = Settings.getJSONSettings();
+
+         $.ajax( { url: "https://api.mongolab.com/api/1/databases/settings/collections/Settings/508bc93fe4b035ff07862200/?apiKey=507717d1e4b03a45bd2f3308&f=%7B%22_id%22:%200%7D&q=%7B%22_id%22:508bc93fe4b035ff07862200%7D",
+         data: data,
+         type: "PUT",
+         contentType: "application/json" } );
+
+         display_message("success","<strong>Success!</strong> Your settings have been saved.");
+     }
+     catch(err)
+     {
+         display_message("error","<strong>Error!</strong> " + err.message);
+     }
+ }
+</script>
+</body></html>

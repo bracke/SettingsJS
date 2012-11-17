@@ -1,7 +1,16 @@
 {
-  "author": "",
-  "name": "",
-  "version": "0.0.0",
-  "dependencies": {},
-  "devDependencies": {}
+  "author": "Bent Bracke",
+  "name": "settingsjs",
+  "version": "1.0.1",
+  "dependencies": {
+      "modernizr": "~2.6.1" ,
+      "jquery": "*"
+  },
+  "devDependencies": {
+      "modernizr": "~2.6.1" ,
+      "jquery": "*",
+      "mocha" : "*",
+      "jasmine": "*",
+      "chai" : "*"
+  }
 }

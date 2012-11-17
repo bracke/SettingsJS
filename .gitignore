@@ -1,7 +1,11 @@
-temp
-dist
+temp/**
+dist/**
 .sass-cache/**
 app/styles/compass_twitter_bootstrap/**
 app/styles/_*
+.idea/*
+.idea/**
+node_modules/**
+components/**
 
 
