@@ -2,7 +2,7 @@
 
 SettingsJS is a JavaScript library which creates a GUI for changing the settings of your app or site.
 
-SettingsJS takes your settings data in JSON as input and creates a GUI for viewing and changing every setting. The changed settings can be read back in JSON format.
+SettingsJS takes your settings data (JSON) as input and creates a GUI for viewing and changing every setting. The changed settings can be read back (JSON).
 
        JSON as input:
         
