@@ -110,6 +110,4 @@ Example:
 
 ## License
 
-Copyright &copy; 2012 Bent Bracke
-
-MIT License.
+MIT: <http://bracke.mit-license.org>
