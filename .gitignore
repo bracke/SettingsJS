@@ -3,9 +3,12 @@ dist/**
 .sass-cache/**
 app/styles/compass_twitter_bootstrap/**
 app/styles/_*
+.idea/
 .idea/*
 .idea/**
 node_modules/**
 components/**
 
 
+
+.idea/workspace.xml
